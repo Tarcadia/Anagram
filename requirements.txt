@@ -1,0 +1,7 @@
+
+click
+
+openai
+GitPython
+
+pyinstaller
