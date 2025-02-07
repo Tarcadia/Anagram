@@ -1,6 +1,6 @@
 
 click
-
+portalocker
 openai
 GitPython
 
