@@ -20,7 +20,9 @@ PATH_META           = "meta.json"
 
 TIMEOUT_LOCK        = 5
 GIT_BRANCH_PREFIX   = "anagram/"
-GIT_AUTHOR          = "anagram"
+GIT_AUTHOR_NAME     = "anagram"
+GIT_AUTHOR_EMAIL    = ""
+ENCODING            = "UTF-8"
 
 
 
@@ -36,7 +38,9 @@ class Anagram:
 
         self.timeout_lock = TIMEOUT_LOCK
         self.git_branch_prefix = GIT_BRANCH_PREFIX
-        self.git_author = GIT_AUTHOR
+        self.git_author_name = GIT_AUTHOR_NAME
+        self.git_author_email = GIT_AUTHOR_EMAIL
+        self.encoding = ENCODING
 
         self.config = None
 
