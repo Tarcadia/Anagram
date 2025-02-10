@@ -53,13 +53,9 @@ class Meta:
             }, fp)
 
     @classmethod
-    @contextmanager
-    def ascontext(cls, filename:str|Path):
+    def from_file(cls, filename:str|Path):
         _path = Path(filename).parent
         _meta = Meta(_path)
         _meta.load(filename)
-        try:
-            yield _meta
-        finally:
-            _meta.save(filename)
+        return _meta
 

@@ -61,15 +61,17 @@ class Anagram:
     @contextmanager
     def _get_meta(self):
         with self._lock:
-            _meta = Meta(self.path_meta)
+            _meta = Meta.from_file(self.path_meta)
             yield _meta
 
 
     @contextmanager
     def _set_meta(self):
-        with self._lock:
-            with Meta.ascontext(self.path_meta) as _meta:
+        with self._get_meta() as _meta:
+            try:
                 yield _meta
+            finally:
+                _meta.save(self.path_meta)
 
 
     def list_changes(self) -> list[str]:
