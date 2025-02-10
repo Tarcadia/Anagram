@@ -7,6 +7,7 @@ from git import Repo
 
 from ._anagram import Anagram
 from .change import Change
+from .change import Message
 
 
 OP_MANAGE_BRANCH    = True
@@ -15,6 +16,16 @@ OP_MANAGE_BRANCH    = True
 
 def print_change(change:Change):
     print(change)
+
+
+def print_message(message:Message):
+    print("=" * 10)
+    if message.by_anagram:
+        # TODO: Use Anagram::git_author_name field for configuring
+        print("Anagram:")
+    else:
+        print("User:")
+    print(message.content)
 
 
 def Command(anagram:Anagram) -> Group:
@@ -48,21 +59,22 @@ def Command(anagram:Anagram) -> Group:
         
         if _change is None:
             # TODO: Implement error handling
-            pass
-        else:
-            print_change(_change)
+            return
+        
+        print_change(_change)
 
 
     @cli.command()
     @click.argument("name",             type=str)
     def checkout(name):
-        _change = anagram.checkout_change(name)
-
+        _change = anagram.checkout_change(
+            name            =name
+        )
         if _change is None:
             # TODO: Implement error handling
-            pass
-        else:
-            print_change(_change)
+            return
+        
+        print_change(_change)
 
 
     @cli.command()
@@ -70,13 +82,17 @@ def Command(anagram:Anagram) -> Group:
     @click.option("--upstream", "-u",   type=str, default=None)
     @click.option("--base", "-b",       type=str, default=None)
     def add(name, upstream, base):
-        _change = anagram.add_change(name, upstream, base)
-        
+        _change = anagram.add_change(
+            name            = name, 
+            upstream        = upstream,
+            base            = base
+        )
+
         if _change is None:
             # TODO: Implement error handling
-            pass
-        else:
-            print_change(_change)
+            return
+        
+        print_change(_change)
 
 
     @cli.command()
@@ -103,13 +119,36 @@ def Command(anagram:Anagram) -> Group:
     @click.argument("value",            type=str)
     def modify(name, field, value):
         _change = anagram.modify_change(name, field, value)
-        
         if _change is None:
             # TODO: Implement error handling
-            pass
-        else:
-            print_change(_change)
+            return
+        
+        print_change(_change)
 
+
+    @cli.command()
+    @click.argument("name",             type=str)
+    def chat_log(name):
+        _change = anagram.get_change(name)
+        if _change is None:
+            # TODO: Implement error handling
+            return
+        
+        _chat = _change.get_chat()
+        _, _messages = _chat.get_files_messages()
+        for _message in _messages:
+            print_message(_message)
+
+
+    @cli.command()
+    @click.argument("name",             type=str)
+    def chat(name):
+        _change = anagram.get_change(name)
+        if _change is None:
+            # TODO: Implement error handling
+            return
+        
+        print_change(_change)
 
 
     return cli
