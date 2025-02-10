@@ -31,7 +31,7 @@ class _Cache:
         _messages = []
         for _message in self.messages:
             # TODO: Use Anagram::git_author_name field for configuring
-            _by_anagram = (_message.author.name == "anagram")
+            _by_anagram = (_message.author.name == "Anagram")
             _messages.append(Message(_message.message, _by_anagram))
             for _diff in _message.parents[0].diff(_message, create_patch=True):
                 _messages.append(Message(str(_diff), _by_anagram))
@@ -78,6 +78,6 @@ class Chat:
         _args = {}
         if by_anagram:
             # TODO: Use Anagram::git_author_name, Anagram::git_author_email field for configuring
-            _args["author"] = Actor("anagram", "")
+            _args["author"] = Actor("Anagram", "")
         self.repo.index.commit(content, *_args)
 

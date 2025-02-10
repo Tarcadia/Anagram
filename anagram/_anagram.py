@@ -20,7 +20,7 @@ PATH_META           = "meta.json"
 
 TIMEOUT_LOCK        = 5
 GIT_BRANCH_PREFIX   = "anagram/"
-GIT_AUTHOR_NAME     = "anagram"
+GIT_AUTHOR_NAME     = "Anagram"
 GIT_AUTHOR_EMAIL    = ""
 ENCODING            = "UTF-8"
 
