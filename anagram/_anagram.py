@@ -130,11 +130,7 @@ class Anagram:
             return _change
 
 
-    def remove_change(self, name:str, force:bool=False) -> Change|None:
-        _args = []
-        if force:
-            _args.append("--force")
-        
+    def remove_change(self, name:str, remove_branch, force:bool=False) -> Change|None:
         with self._set_meta() as meta:
             _repo = Repo(self.path)
 
@@ -144,7 +140,15 @@ class Anagram:
             _change = meta.changes.pop(name, None)
             if not _change is None:
                 _worktree = _change.path / _change.worktree
-                _repo.git.worktree("remove", *_args, _worktree)
+                _branch = _repo.heads[_change.branch]
+
+                if force:
+                    _repo.git.worktree("remove", "--force", _worktree)
+                else:
+                    _repo.git.worktree("remove", _worktree)
+                
+                if remove_branch:
+                    _repo.delete_head(_branch, force=force)
             
             return _change
 

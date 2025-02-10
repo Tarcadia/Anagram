@@ -85,17 +85,16 @@ def Command(anagram:Anagram) -> Group:
                                         is_flag=True, default=not _op_manage_branch)
     @click.option("--force", "-F",      is_flag=True, default=False)
     def remove(name, keep_branch, force):
-        _repo = Repo(anagram.path)
-        _change = anagram.remove_change(name, force)
-        
+        _change = anagram.remove_change(
+            name            = name,
+            remove_branch   = not keep_branch,
+            force           = force
+        )
         if _change is None:
             # TODO: Implement error handling
-            pass
-        else:
-            _branch = _repo.heads[_change.branch]
-            if not keep_branch:
-                _repo.delete_head(_branch, force=force)
-            print_change(_change)
+            return
+        
+        print_change(_change)
 
 
     @cli.command()
