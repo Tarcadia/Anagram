@@ -11,18 +11,20 @@ from ._meta import Meta
 from .change import Change
 from .llm import Llm
 
+from ._consts import SYM_ANAGRAM
 
-PATH_ANAGRAM        = ".anagram"
-PATH_LOCK           = ".lock"
-PATH_CONFIG         = "config"
-PATH_CHANGE         = "change"
-PATH_META           = "meta.json"
+from ._consts import PATH_DOT_ANAGRAM
+from ._consts import PATH_LOCK
+from ._consts import PATH_CONFIG
+from ._consts import PATH_CHANGE
+from ._consts import PATH_META
 
-TIMEOUT_LOCK        = 5
-GIT_BRANCH_PREFIX   = "anagram/"
-GIT_AUTHOR_NAME     = "Anagram"
-GIT_AUTHOR_EMAIL    = ""
-ENCODING            = "UTF-8"
+from ._consts import GIT_BRANCH_PREFIX
+from ._consts import GIT_AUTHOR_NAME
+from ._consts import GIT_AUTHOR_EMAIL
+
+from ._consts import TIMEOUT
+from ._consts import ENCODING
 
 
 
@@ -30,16 +32,16 @@ class Anagram:
 
     def __init__(self, path:str|Path):
         self.path = Path(path)
-        self.path_anagram = self.path / PATH_ANAGRAM
+        self.path_anagram = self.path / PATH_DOT_ANAGRAM
         self.path_lock = self.path_anagram / PATH_LOCK
         self.path_config = self.path_anagram / PATH_CONFIG
         self.path_change = self.path_anagram / PATH_CHANGE
         self.path_meta = self.path_anagram / PATH_META
 
-        self.timeout_lock = TIMEOUT_LOCK
         self.git_branch_prefix = GIT_BRANCH_PREFIX
         self.git_author_name = GIT_AUTHOR_NAME
         self.git_author_email = GIT_AUTHOR_EMAIL
+        self.lock_timeout = TIMEOUT
         self.encoding = ENCODING
 
         self.config = None
@@ -49,7 +51,7 @@ class Anagram:
             # TODO: Implement applying values read by Config.
             pass
 
-        self._lock = Lock(self.path_lock, timeout=self.timeout_lock)
+        self._lock = Lock(self.path_lock, timeout=self.lock_timeout)
 
         with self._lock:
             self.path_change.mkdir(exist_ok=True)

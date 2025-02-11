@@ -8,6 +8,9 @@ from git import Actor
 
 from ._message import Message
 
+from .._consts import ENCODING
+from .._consts import GIT_AUTHOR_NAME
+
 
 
 @dataclass
@@ -24,14 +27,14 @@ class _Cache:
         for _item in self.base[0].tree.traverse():
             if _item.type == "blob":
                 # TODO: Use Anagram::encoding field for configuring
-                _files[_item.path] = _item.data_stream.read().decode("UTF-8")
+                _files[_item.path] = _item.data_stream.read().decode(ENCODING)
         self._files = _files
 
     def _update_messages(self):
         _messages = []
         for _message in self.messages:
             # TODO: Use Anagram::git_author_name field for configuring
-            _by_anagram = (_message.author.name == "Anagram")
+            _by_anagram = (_message.author.name == GIT_AUTHOR_NAME)
             _messages.append(Message(_message.message, _by_anagram))
             for _diff in _message.parents[0].diff(_message, create_patch=True):
                 _messages.append(Message(str(_diff), _by_anagram))
@@ -78,6 +81,6 @@ class Chat:
         _args = {}
         if by_anagram:
             # TODO: Use Anagram::git_author_name, Anagram::git_author_email field for configuring
-            _args["author"] = Actor("Anagram", "")
+            _args["author"] = Actor(GIT_AUTHOR_NAME, "")
         self.repo.index.commit(content, *_args)
 

@@ -9,8 +9,8 @@ from ._anagram import Anagram
 from .change import Change
 from .change import Message
 
-
-OP_MANAGE_BRANCH    = True
+from ._consts import GIT_AUTHOR_NAME
+from ._consts import CMD_KEEP_BRANCH
 
 
 
@@ -22,7 +22,7 @@ def print_message(message:Message):
     print("=" * 10)
     if message.by_anagram:
         # TODO: Use Anagram::git_author_name field for configuring
-        print("Anagram:")
+        print(f"{GIT_AUTHOR_NAME}:")
     else:
         print("User:")
     print(message.content)
@@ -30,7 +30,7 @@ def print_message(message:Message):
 
 def Command(anagram:Anagram) -> Group:
 
-    _op_manage_branch = OP_MANAGE_BRANCH
+    _op_keep_branch = CMD_KEEP_BRANCH
 
     if not anagram.config is None:
         # TODO: Implement applying values read by Config.
@@ -98,7 +98,7 @@ def Command(anagram:Anagram) -> Group:
     @cli.command()
     @click.argument("name",             type=str)
     @click.option("--keep-branch/--!keep-branch", "-kb/-!kb",
-                                        is_flag=True, default=not _op_manage_branch)
+                                        is_flag=True, default=_op_keep_branch)
     @click.option("--force", "-F",      is_flag=True, default=False)
     def remove(name, keep_branch, force):
         _change = anagram.remove_change(
