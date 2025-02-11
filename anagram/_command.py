@@ -33,7 +33,8 @@ def Command(anagram:Anagram) -> Group:
     _op_keep_branch = CMD_KEEP_BRANCH
 
     if not anagram.config is None:
-        # TODO: Implement applying values read by Config.
+        if anagram.config.has_option("command", "keep_branch"):
+            _op_keep_branch = anagram.config.get("command", "keep_branch")
         pass
 
 

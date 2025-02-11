@@ -1,6 +1,5 @@
 
 
-import json
 from pathlib import Path
 from contextlib import contextmanager
 
@@ -10,6 +9,10 @@ from git import Repo
 from ._meta import Meta
 from .change import Change
 from .llm import Llm
+
+from ._config import Config
+from ._config import CONFIG_MACHINE
+from ._config import CONFIG_USER
 
 from ._consts import SYM_ANAGRAM
 
@@ -44,11 +47,14 @@ class Anagram:
         self.lock_timeout = TIMEOUT
         self.encoding = ENCODING
 
-        self.config = None
+        self.config = Config()
+        self.config.update(CONFIG_MACHINE)
+        self.config.update(CONFIG_USER)
 
         if self.path_config.exists():
-            # TODO: Implement Config for a configurable Anagram instance.
-            # TODO: Implement applying values read by Config.
+            _config = Config(self.path_config)
+            self.config.update(_config)
+            self.config.pick_to(SYM_ANAGRAM, self)
             pass
 
         self._lock = Lock(self.path_lock, timeout=self.lock_timeout)
