@@ -20,6 +20,7 @@ CONFIG_CWD          = None
 class Config(ConfigParser):
 
     def __init__(self, path:str|Path|None=None):
+        super(ConfigParser, self).__init__()
         self.path = path
         if not self.path is None:
             self.read_path(self.path)
@@ -47,13 +48,13 @@ class Config(ConfigParser):
 
 
     def pick_to(self, section:str, obj:object):
-        if section in self.config:
-            for _key in self.config[section]:
+        if section in self:
+            for _key in self[section]:
                 try:
                     _attr = getattr(obj, _key)
                 except AttributeError:
                     continue
-                _val = type(_attr)(self.config[section][_key])
+                _val = type(_attr)(self[section][_key])
                 setattr(obj, _key, _val)
 
 
@@ -67,5 +68,8 @@ if not ROOT_USER is None:
 if not ROOT_CWD is None:
     CONFIG_CWD = Config(ROOT_CWD / PATH_DOT_ANAGRAM / PATH_CONFIG)
 
-CONFIG_ALL = Config().update(CONFIG_MACHINE).update(CONFIG_USER).update(CONFIG_CWD)
+CONFIG = Config()
+CONFIG.update(CONFIG_MACHINE)
+CONFIG.update(CONFIG_USER)
+CONFIG.update(CONFIG_CWD)
 
