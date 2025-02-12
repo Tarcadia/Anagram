@@ -3,28 +3,27 @@
 import click
 from click import Group
 
-from git import Repo
-
 from ._anagram import Anagram
 from .change import Change
 from .change import Message
 
-from ._consts import GIT_AUTHOR_NAME
 from ._consts import CMD_KEEP_BRANCH
 
 
 
 def print_change(change:Change):
-    print(change)
+    print(change.name)
+    print(f"Branch : {change.branch}")
+    print(f"Upstream : {change.upstream}")
+    print(f"Worktree : {change.worktree}")
 
 
 def print_message(message:Message):
     print("=" * 10)
-    if message.by_anagram:
-        # TODO: Use Anagram::git_author_name field for configuring
-        print(f"{GIT_AUTHOR_NAME}:")
-    else:
-        print("User:")
+    _title = message.commit.author.name
+    if message.commit.author.email:
+        _title += f" <{message.commit.author.email}>"
+    print(f"{_title}:")
     print(message.content)
 
 
