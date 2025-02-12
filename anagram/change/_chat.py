@@ -65,6 +65,7 @@ class Chat:
             if _commit == _base[0]:
                 break
             _messages.append(_commit)
+        _messages.reverse()
         if self._cache is None:
             self._cache = _Cache(_base, _messages)
         elif self._cache.base != _base:
