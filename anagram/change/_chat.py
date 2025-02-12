@@ -35,9 +35,9 @@ class _Cache:
         for _message in self.messages:
             # TODO: Use Anagram::git_author_name field for configuring
             _by_anagram = (_message.author.name == GIT_AUTHOR_NAME)
-            _messages.append(Message(_message.message, _by_anagram))
+            _messages.append(Message(_message, _message.message, _by_anagram))
             for _diff in _message.parents[0].diff(_message, create_patch=True):
-                _messages.append(Message(str(_diff), _by_anagram))
+                _messages.append(Message(_message, str(_diff), _by_anagram))
         self._messages = _messages
 
     def update_messages(self, messages):
