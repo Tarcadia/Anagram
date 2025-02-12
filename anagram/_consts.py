@@ -17,6 +17,15 @@ elif os.name == "nt":
     ROOT_USER       = os.getenv("APPDATA", None)
     ROOT_CWD        = "."
 
+if not ROOT_MACHINE is None:
+    ROOT_MACHINE    = Path(ROOT_MACHINE)
+
+if not ROOT_USER is None:
+    ROOT_USER       = Path(ROOT_USER)
+
+if not ROOT_CWD is None:
+    ROOT_CWD        = Path(ROOT_CWD)
+
 
 SYM_ANAGRAM         = "anagram"
 
