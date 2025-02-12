@@ -50,12 +50,11 @@ class Anagram:
         self.config = Config()
         self.config.update(CONFIG_MACHINE)
         self.config.update(CONFIG_USER)
-
         if self.path_config.exists():
             _config = Config(self.path_config)
             self.config.update(_config)
-            self.config.pick_to(SYM_ANAGRAM, self)
-            pass
+        
+        self.config.pick_to(SYM_ANAGRAM, self)
 
         self._lock = Lock(self.path_lock, timeout=self.lock_timeout)
 
