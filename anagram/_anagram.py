@@ -87,85 +87,104 @@ class Anagram:
 
     def get_change(self, name:str) -> Change|None:
         with self._get_meta() as meta:
-            if name in meta.changes:
-                return meta.changes[name]
-            else:
-                return None
+            _change = meta.changes.get(name, None)
+            return _change
 
 
     def get_current_change(self) -> Change|None:
         with self._get_meta() as meta:
-            if meta.current in meta.changes:
-                return meta.changes[meta.current]
-            else:
-                return None
+            _change = meta.changes.get(meta.current, None)
+            return _change
 
 
     def checkout_change(self, name:str) -> Change|None:
         with self._set_meta() as meta:
-            if name in meta.changes:
-                meta.current = name
-                return meta.changes[name]
-            else:
-                return None
+            _change = meta.changes.get(name, None)
+            if _change is None:
+                return
+
+            meta.current = _change.name
+            return _change
 
 
     def add_change(self, name:str, upstream:str=None, base:str=None) -> Change|None:
         with self._set_meta() as meta:
             _repo = Repo(self.path)
+            _change = meta.changes.get(name, None)
+            if _change is None:
+                if not upstream is None:
+                    _upstream = _repo.refs[upstream].name
+                elif not meta.current is None:
+                    _upstream = _repo.refs[meta.changes[meta.current].branch].name
+                else:
+                    _upstream = _repo.head.ref.name
 
-            if not upstream is None:
-                _upstream = _repo.refs[upstream].name
-            elif not meta.current is None:
-                _upstream = _repo.refs[meta.changes[meta.current].branch].name
-            else:
-                _upstream = _repo.head.ref.name
+                _branch = self.git_branch_prefix + name
+                _worktree = self.path_change / name
+                _change = Change(meta.path, name, _branch, _upstream, _worktree.relative_to(meta.path).as_posix())
+                meta.changes[name] = _change
+
             if not base is None:
                 _base = _repo.commit(base)
-            elif not meta.current is None:
-                _base = _repo.refs[_upstream].commit
             else:
-                _base = _repo.head.ref.commit
+                _base = _repo.commit(_upstream)
 
-            _name = self.git_branch_prefix + name
-            _worktree = self.path_change / name
-            _branch = _repo.create_head(_name, _base).name
-            _repo.git.worktree("add", _worktree, _branch)
-            _change = Change(meta.path, name, _branch, _upstream, _worktree.relative_to(meta.path).as_posix())
-            meta.changes[name] = _change
+            try:
+                _repo.create_head(_change.branch, _base)
+            except:
+                # TODO: Implement warning message
+                pass
+
+            try:
+                _repo.git.worktree("add", _change.worktree, _change.branch)
+            except:
+                # TODO: Implement warning message
+                pass
+
             return _change
 
 
-    def remove_change(self, name:str, remove_branch, force:bool=False) -> Change|None:
+    def remove_change(self, name:str, remove_branch:bool, force:bool=False) -> Change|None:
         with self._set_meta() as meta:
             _repo = Repo(self.path)
+            _change = meta.changes.pop(name, None)
+            if _change is None:
+                return
 
             if meta.current == name:
                 meta.current = None
-            
-            _change = meta.changes.pop(name, None)
-            if not _change is None:
-                _worktree = _change.path / _change.worktree
-                _branch = _repo.heads[_change.branch]
 
-                if force:
-                    _repo.git.worktree("remove", "--force", _worktree)
-                else:
-                    _repo.git.worktree("remove", _worktree)
-                
-                if remove_branch:
+            _worktree = _change.path / _change.worktree
+            _force = ["--force"] if force else []
+            try:
+                _repo.git.worktree("remove", *_force, _worktree)
+            except:
+                # TODO: Implement warning message
+                pass
+
+            if remove_branch:
+                _branch = _repo.heads[_change.branch]
+                try:
                     _repo.delete_head(_branch, force=force)
-            
+                except:
+                    # TODO: Implement warning message
+                    pass
+
             return _change
 
 
     def modify_change(self, name:str, field:str, value) -> Change|None:
         with self._set_meta() as meta:
-            if name in meta.changes:
-                setattr(meta.changes[name], field, value)
-                return meta.changes[name]
-            else:
-                return None
+            _change = meta.changes.get(name, None)
+            if _change is None:
+                return
+
+            try:
+                setattr(_change, field, value)
+            except:
+                # TODO: Implement warning message
+                pass
+            return _change
 
 
     def modify_change_name(self, name:str, rename:str) -> Change|None:
@@ -176,18 +195,20 @@ class Anagram:
 
     def modify_change_branch(self, name:str, branch:str) -> Change|None:
         with self._set_meta() as meta:
-            if name in meta.changes:
-                meta.changes[name].branch = branch
-                return self.changes[name]
-            else:
-                return None
+            _change = meta.changes.get(name, None)
+            if _change is None:
+                return
+
+            _change.branch = branch
+            return _change
 
 
     def modify_change_upstream(self, name:str, upstream:str) -> Change|None:
         with self._set_meta() as meta:
-            if name in meta.changes:
-                meta.changes[name].upstream = upstream
-                return self.changes[name]
-            else:
-                return None
+            _change = meta.changes.get(name, None)
+            if _change is None:
+                return
+
+            _change.upstream = upstream
+            return _change
 
