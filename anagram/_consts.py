@@ -41,7 +41,8 @@ GIT_BRANCH_PREFIX   = f"{SYM_ANAGRAM}/"
 GIT_AUTHOR_NAME     = SYM_ANAGRAM.capitalize()
 GIT_AUTHOR_EMAIL    = ""
 
-CMD_KEEP_BRANCH     = False
+CMD_MAN_BRANCH      = True
+CMD_MAN_WORKTREE    = True
 
 TIMEOUT             = 5
 ENCODING            = "UTF-8"

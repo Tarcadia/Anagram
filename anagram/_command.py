@@ -1,5 +1,7 @@
 
 
+from dataclasses import dataclass
+
 import click
 from click import Group
 
@@ -7,7 +9,8 @@ from ._anagram import Anagram
 from .change import Change
 from .change import Message
 
-from ._consts import CMD_KEEP_BRANCH
+from ._consts import CMD_MAN_BRANCH
+from ._consts import CMD_MAN_WORKTREE
 
 
 
@@ -27,14 +30,17 @@ def print_message(message:Message):
     print(message.content)
 
 
+@dataclass
+class _Config:
+    manage_branch:bool = CMD_MAN_BRANCH
+    manage_worktree:bool = CMD_MAN_WORKTREE
+
+
 def Command(anagram:Anagram) -> Group:
 
-    _op_keep_branch = CMD_KEEP_BRANCH
-
+    _config = _Config()
     if not anagram.config is None:
-        if anagram.config.has_option("command", "keep_branch"):
-            _op_keep_branch = anagram.config.get("command", "keep_branch")
-        pass
+        anagram.config.pick_to("command", _config)
 
 
     @click.group()
@@ -97,13 +103,16 @@ def Command(anagram:Anagram) -> Group:
 
     @cli.command()
     @click.argument("name",             type=str)
-    @click.option("--keep-branch/--!keep-branch", "-kb/-!kb",
-                                        is_flag=True, default=_op_keep_branch)
+    @click.option("--remove-worktree/--keep-worktree", "-rw/-kw",
+                                        is_flag=True, default=_config.manage_branch)
+    @click.option("--remove-branch/--keep-branch", "-rb/-kb",
+                                        is_flag=True, default=_config.manage_worktree)
     @click.option("--force", "-F",      is_flag=True, default=False)
-    def remove(name, keep_branch, force):
+    def remove(name, remove_worktree, remove_branch, force):
         _change = anagram.remove_change(
             name            = name,
-            remove_branch   = not keep_branch,
+            remove_worktree = not remove_worktree,
+            remove_branch   = not remove_branch,
             force           = force
         )
         if _change is None:
