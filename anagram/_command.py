@@ -1,5 +1,8 @@
 
 
+import logging
+from ._logging import logging_set
+
 from dataclasses import dataclass
 
 import click
@@ -46,6 +49,8 @@ def Command(anagram:Anagram) -> Group:
     @click.group()
     @click.option("--verbose", "-v",    count=True, default=0)
     def cli(verbose:int):
+        _logging_level = logging.WARNING-10*verbose
+        logging_set(console_level=max(0, _logging_level))
         pass
 
 

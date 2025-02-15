@@ -32,6 +32,7 @@ SYM_ANAGRAM         = "anagram"
 PATH_ANAGRAM        = SYM_ANAGRAM
 PATH_DOT_ANAGRAM    = f".{SYM_ANAGRAM}"
 
+PATH_LOG            = f"{SYM_ANAGRAM}.log"
 PATH_LOCK           = ".lock"
 PATH_CONFIG         = "config"
 PATH_CHANGE         = "change"
