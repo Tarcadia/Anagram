@@ -9,6 +9,7 @@ from git import Repo
 from ._meta import Meta
 from .change import Change
 from .llm import Llm
+from .llm import get_llm
 
 from ._config import Config
 from ._config import CONFIG_MACHINE
@@ -211,5 +212,13 @@ class Anagram:
                 return
 
             _change.upstream = upstream
+            return _change
+
+
+    def get_llm(self, name:str) -> Llm|None:
+        with self._get_meta() as meta:
+            _change = meta.changes.get(name, None)
+            _chat = _change.get_chat()
+            get_llm(_chat, self.config)
             return _change
 

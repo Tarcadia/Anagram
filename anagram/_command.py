@@ -202,5 +202,26 @@ def Command(anagram:Anagram) -> Group:
         print("=" * 10)
 
 
+    @cli.command()
+    @click.argument("name",             type=str, required=False, default=None)
+    def chat_complete(name, message):
+        _change = anagram.get_change(name) or anagram.get_current_change()
+        logging.debug(_change)
+
+        if _change is None:
+            logging.error(f"Change {name} not found.")
+            return
+
+        _chat = _change.get_chat()
+        _chat.add_message(message)
+        _llm = anagram.get_llm(name)
+        _, _messages = _chat.get_files_messages()
+        print(f"Completed to change {name}:")
+        logging.info(f"Completed to change {name}: ...")
+        print("=" * 10)
+        print_message(_messages[-1])
+        print("=" * 10)
+
+
     return cli
 
