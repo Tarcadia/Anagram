@@ -18,14 +18,12 @@ from ._consts import CMD_MAN_WORKTREE
 
 
 def print_change(change:Change):
-    print(change.name)
     print(f"Branch : {change.branch}")
     print(f"Upstream : {change.upstream}")
     print(f"Worktree : {change.worktree}")
 
 
 def print_message(message:Message):
-    print("=" * 10)
     _title = message.commit.author.name
     if message.commit.author.email:
         _title += f" <{message.commit.author.email}>"
@@ -57,34 +55,43 @@ def Command(anagram:Anagram) -> Group:
     @cli.command()
     def list():
         _changes = anagram.list_changes()
-        print(_changes)
+        logging.debug(_changes)
+
+        print("List of changes:")
+        print("=" * 10)
+        for _name in _changes:
+            print(_name)
 
 
     @cli.command()
-    @click.argument("name",             type=str, default=None)
+    @click.argument("name",             type=str, required=False, default=None)
     def status(name):
-        if name is None:
-            _change = anagram.get_current_change()
-        else:
-            _change = anagram.get_change(name)
-        
+        _change = anagram.get_change(name) or anagram.get_current_change()
+        logging.debug(_change)
+
         if _change is None:
-            # TODO: Implement error handling
+            logging.error(f"Change {name} not found.")
             return
-        
+
+        print(f"Status of change {name}:")
+        logging.info(f"Status of change {name}: ...")
+        print("=" * 10)
         print_change(_change)
 
 
     @cli.command()
     @click.argument("name",             type=str)
     def checkout(name):
-        _change = anagram.checkout_change(
-            name            =name
-        )
+        _change = anagram.checkout_change(name)
+        logging.debug(_change)
+
         if _change is None:
-            # TODO: Implement error handling
+            logging.error(f"Checking out change {name} failed.")
             return
-        
+
+        print(f"Checked out change {name}:")
+        logging.info(f"Checked out change {name}: ...")
+        print("=" * 10)
         print_change(_change)
 
 
@@ -94,15 +101,19 @@ def Command(anagram:Anagram) -> Group:
     @click.option("--base", "-b",       type=str, default=None)
     def add(name, upstream, base):
         _change = anagram.add_change(
-            name            = name, 
+            name,
             upstream        = upstream,
             base            = base
         )
+        logging.debug(_change)
 
         if _change is None:
-            # TODO: Implement error handling
+            logging.error(f"Adding change {name} failed.")
             return
-        
+
+        print(f"Added change {name}:")
+        logging.info(f"Added change {name}: ...")
+        print("=" * 10)
         print_change(_change)
 
 
@@ -115,15 +126,20 @@ def Command(anagram:Anagram) -> Group:
     @click.option("--force", "-F",      is_flag=True, default=False)
     def remove(name, remove_worktree, remove_branch, force):
         _change = anagram.remove_change(
-            name            = name,
+            name,
             remove_worktree = not remove_worktree,
             remove_branch   = not remove_branch,
             force           = force
         )
+        logging.debug(_change)
+
         if _change is None:
-            # TODO: Implement error handling
+            logging.error(f"Removing change {name} failed.")
             return
-        
+
+        print(f"Removed change {name}:")
+        logging.info(f"Removed change {name}: ...")
+        print("=" * 10)
         print_change(_change)
 
 
@@ -133,36 +149,57 @@ def Command(anagram:Anagram) -> Group:
     @click.argument("value",            type=str)
     def modify(name, field, value):
         _change = anagram.modify_change(name, field, value)
+        logging.debug(_change)
+
         if _change is None:
-            # TODO: Implement error handling
+            logging.error(f"Modifying change {name} failed.")
             return
-        
+
+        print(f"Modified change {name}:")
+        logging.info(f"Modified change {name}: ...")
+        print("=" * 10)
         print_change(_change)
 
 
     @cli.command()
     @click.argument("name",             type=str)
     def chat_log(name):
-        _change = anagram.get_change(name)
+        _change = anagram.get_change(name) or anagram.get_current_change()
+        logging.debug(_change)
+
         if _change is None:
-            # TODO: Implement error handling
+            logging.error(f"Change {name} not found.")
             return
         
         _chat = _change.get_chat()
         _, _messages = _chat.get_files_messages()
+        print(f"Log of change {name}:")
+        logging.info(f"Log of change {name}: ...")
+        print("=" * 10)
         for _message in _messages:
             print_message(_message)
+            print("=" * 10)
 
 
     @cli.command()
-    @click.argument("name",             type=str)
-    def chat(name):
-        _change = anagram.get_change(name)
+    @click.argument("name",             type=str, required=False, default=None)
+    @click.argument("message",          type=str)
+    def chat_message(name, message):
+        _change = anagram.get_change(name) or anagram.get_current_change()
+        logging.debug(_change)
+
         if _change is None:
-            # TODO: Implement error handling
+            logging.error(f"Change {name} not found.")
             return
-        
-        print_change(_change)
+
+        _chat = _change.get_chat()
+        _chat.add_message(message)
+        _, _messages = _chat.get_files_messages()
+        print(f"Messaged to change {name}:")
+        logging.info(f"Messaged to change {name}: ...")
+        print("=" * 10)
+        print_message(_messages[-1])
+        print("=" * 10)
 
 
     return cli
