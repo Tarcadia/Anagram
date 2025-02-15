@@ -67,9 +67,8 @@ class Anagram:
 
     @contextmanager
     def _get_meta(self):
-        with self._lock:
-            _meta = Meta.from_file(self.path_meta)
-            yield _meta
+        _meta = Meta.from_file(self.path_meta)
+        yield _meta
 
 
     @contextmanager
